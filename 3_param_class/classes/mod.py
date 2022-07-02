@@ -26,6 +26,13 @@ class Test3(pccm.Class):
         code = pccm.FunctionCode("")
         with code.if_("a > 5"):
             code.raw("a += 3;")
+        
+        # ———— Another Version ———— #
+        # code.raw("""
+        # if(a > 5){
+        #     a+=3;
+        # }
+        # """)
 
         code.raw("""
         auto tst1 = Test2();

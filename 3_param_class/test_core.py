@@ -20,9 +20,20 @@ def test_core():
     cu_scratch.add_func_decl(core.FunctionDecl(scratch_meta, scratch_code_obj))
     cu_scratch.namespace = "scratch"
     cu_scratch.class_name = "ScratchClass"
+
+    # cu_scrach will be like:
+    
+    # # include <scratch/ScratchClass.h>
+    # namespace scratch {
+    # int ScratchClass::scratch_func()   {
+    #   return 50051;
+    # }
+    # } // namespace scratch
+
     lib = builder.build_pybind(
-        [cu_scratch, cu, cu2, PbTestVirtual()],
+        [cu_scratch,cu, cu2, PbTestVirtual()],
         Path(__file__).parent / "mylib")
+    
     assert lib.classes.mod.Test4.add_static(1, 2) == 3
     assert not hasattr(lib.classes.mod.Test4, "invalid_method")
     t3 = lib.classes.mod.Test3()
@@ -51,12 +62,16 @@ def test_core():
     assert vobj.kValue1 | vobj.kValue2 == 3
 
     tsc = lib.classes.mod.OtherSimpleClass()
-    tsc.a = 444
+    tsc.a = 456
     tsc_bytes = pickle.dumps(tsc)
 
     tsc_recover = pickle.loads(tsc_bytes)
-    print(tsc_recover.a)
+    assert tsc_recover.a == tsc.a
+
+    return lib
 
 
 if __name__ == "__main__":
-    test_core()
+    lib = test_core()
+    
+    print("Check Pass!")
