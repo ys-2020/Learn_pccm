@@ -10,5 +10,5 @@ test:
 
 clean:	
 	$(RM) build
-	$(RM) pyifiles
+	$(RM) mylib
 	$(RM) *.so
