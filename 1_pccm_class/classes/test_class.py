@@ -22,5 +22,5 @@ class Test1(pccm.Class):
         code = pccm.FunctionCode("")
         code.raw("""
         return a + b;
-        """).arg("a,b", "int").ret("int")
+        """).arg("a", "int").arg("b","double").ret("int")   # multiple types of variables. 
         return code
