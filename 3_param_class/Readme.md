@@ -1,6 +1,6 @@
 # pccm.ParameterizedClass 
 
-* Excerpted from the [Introduction of PCCM ]( [PCCM/docs at master · FindDefinition/PCCM (github.com)](https://github.com/FindDefinition/PCCM/tree/master/docs) ) by its author.
+* Excerpted from the [Introduction of PCCM](https://github.com/FindDefinition/PCCM/tree/master/docs) by its author.
 
 ParameterizedClass is the most significant part of PCCM. 
 
