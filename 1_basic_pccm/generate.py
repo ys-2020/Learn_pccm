@@ -11,7 +11,7 @@ if __name__ == "__main__":
 
     lib = builder.build_pybind(
         [test1],
-        Path(__file__).parent / "pyifiles")
+        Path(__file__).parent / "mylib")
 
     print("Code Generated!")
     # print('lib=',lib)

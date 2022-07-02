@@ -6,7 +6,7 @@
 # —————— New Version —————— #
 import importlib
 
-module_spec = importlib.util.find_spec('pyifiles')
+module_spec = importlib.util.find_spec('mylib')
 lib = importlib.util.module_from_spec(module_spec)
 print(lib)
 
