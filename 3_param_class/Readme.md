@@ -16,9 +16,7 @@ PCCM is a new framework to handle the problem of C++ template meta programming.
 
 
 
-#### The pccm.ParamClass inherit pccm.Class. 
-
-#### But have different code generation logic. 
+### The pccm.ParamClass inherit pccm.Class. But have different code generation logic. 
 
 A most important difference is that pccm.ParamClass can accept arguments in \_\_init\_\_, implying that a pccm.ParamClass can be parameterized like a C++ template class. 
 
