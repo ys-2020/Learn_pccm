@@ -17,7 +17,6 @@ os.environ['CUDA_VISIBLE_DEVICES']='0'
 CUTLASS_ROOT = Path("/home/yangshang19/nfs/smr/cutlass")
 import numpy as np
 
-
 class CutlassLib(pccm.Class):
     def __init__(self):
         super().__init__()
