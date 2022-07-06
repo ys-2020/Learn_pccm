@@ -17,6 +17,7 @@ __pycache__
 *.csv
 *.log
 *.o
+*.so
 *.a
 
 
