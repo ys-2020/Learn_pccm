@@ -2,8 +2,6 @@
 
 * This example shows how to build CUTLASS GEMM with pccm.
 
-
-
 ### Prerequisites
 
 * You should have installed [cumm](https://github.com/FindDefinition/cumm) and [pccm](https://github.com/FindDefinition/pccm ) in your environment. 
