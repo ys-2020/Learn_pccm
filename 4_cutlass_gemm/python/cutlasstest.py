@@ -250,13 +250,13 @@ def cutlass_test_gemm(cu: CutlassGemm):
 
     if params.trans_a:
         a = np.ascontiguousarray(a.transpose(1, 0))
-        print("a Transposed")
+        # print("a Transposed")
     if params.trans_b:
         b = np.ascontiguousarray(b.transpose(1, 0))
-        print("b Transposed")
+        # print("b Transposed")
     if params.trans_c:
         c = np.ascontiguousarray(c.transpose(1, 0))
-        print("c Transposed")
+        # print("c Transposed")
 
     # to Tensorview
     a_tv = tv.from_numpy(a).cuda()
@@ -268,8 +268,11 @@ def cutlass_test_gemm(cu: CutlassGemm):
         a_cpu = a_tv.cpu().numpy()
         b_cpu = b_tv.cpu().numpy()
         
-        print(m, n, k, a.shape, b.shape, c.shape, c_cpu.shape,
-              np.max(np.abs(c_cpu - c)))
+        print("a.shape = ",a.shape)
+        print("b.shape = ",b.shape)
+        print("c.shape = ",c.shape)
+        print("max_error = ",np.max(np.abs(c_cpu - c)))
+              
         
 
 
@@ -305,6 +308,6 @@ def cutlass_test_tf32():
 
 
 if __name__ == "__main__":
-    cutlass_test_simt_dp4a()
-    # cutlass_test_tf32()  # 浮点存在精度问题
+    # cutlass_test_simt_dp4a()
+    cutlass_test_tf32()  
     # cutlass_test_turing()
