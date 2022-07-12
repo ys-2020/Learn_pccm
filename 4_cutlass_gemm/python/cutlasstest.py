@@ -58,6 +58,7 @@ class CutlassGemm(pccm.ParameterizedClass):
         top_shape = [1, 1, 1]
         if self.params.tensorop is not None:
             top_shape = self.params.tensorop.shape
+            # top_shape = [16,8,8]
         code.raw(f"""
         using ElementAccumulator = {self.params.dtype_acc.cutlass};        
         using ElementComputeEpilogue = {self.params.dtype_comp.cutlass}; 
@@ -211,9 +212,9 @@ def cutlass_profile_win(cu: CutlassGemm):
 
 def cutlass_test_gemm(cu: CutlassGemm):
     params = cu.params
-    cu.namespace = "CuTlassTest"
-    with tv.measure_and_print():
-        lib = pccm.builder.build_pybind([cu],
+    cu.namespace = "CutlassTest"
+    # with tv.measure_and_print():       # Print CUDATimer
+    lib = pccm.builder.build_pybind([cu],
                                         Path(__file__).parent / "cutlassgemm_test",
                                         build_dir=Path(__file__).parent / "build" /
                                         "build_cutlass",
@@ -221,20 +222,17 @@ def cutlass_test_gemm(cu: CutlassGemm):
                                         verbose=False,
                                         disable_anno=True,
                                         std="c++17")
+    
     np.random.seed(12315)
-    m = 256 + 32
-    n = 256 + 40
-    k = 136
-    m *= 2
-    n *= 2
-    k *= 2
-    m = 128
-    n = 128
-    k = 8
+    # Define the problem size here
+    m = 4096
+    n = 2048
+    k = 64
     m = max(params.ts[0], m)
     n = max(params.ts[1], n)
     k = max(params.ts[2], k)
 
+    # Random init a & b, compute c
     if params.dtype_a == dtypes.int8:
         a = np.random.randint(-2, 2, size=[m, k]).astype(np.int8)
         b = np.random.randint(-2, 2, size=[k, n]).astype(np.int8)
@@ -242,27 +240,37 @@ def cutlass_test_gemm(cu: CutlassGemm):
         c = (a.astype(dtype_c) @ b.astype(dtype_c)).astype(
             dtypes.get_npdtype(params.dtype_c))
 
-    else:
+    else:  
         a = np.random.uniform(-1, 1, size=[m, k]).astype(
             dtypes.get_npdtype(params.dtype_a))
         b = np.random.uniform(-1, 1, size=[k, n]).astype(
             dtypes.get_npdtype(params.dtype_b))
         c = (a @ b).astype(dtypes.get_npdtype(params.dtype_c))
+        # a @ b means matrix multiply
+
     if params.trans_a:
         a = np.ascontiguousarray(a.transpose(1, 0))
+        print("a Transposed")
     if params.trans_b:
         b = np.ascontiguousarray(b.transpose(1, 0))
+        print("b Transposed")
     if params.trans_c:
         c = np.ascontiguousarray(c.transpose(1, 0))
-    # print("WTF PREPARED")
+        print("c Transposed")
 
+    # to Tensorview
     a_tv = tv.from_numpy(a).cuda()
     b_tv = tv.from_numpy(b).cuda()
     for i in range(1):
-        c_tv = lib.CuTlassTest.CutlassGemm.matmul(a_tv, b_tv, 1)
+        c_tv = lib.CutlassTest.CutlassGemm.matmul(a_tv, b_tv, 1)
         c_cpu = c_tv.cpu().numpy()
-        print(m, n, k, a.mean(), b.mean(), c.mean(),
-              np.linalg.norm(c_cpu - c))
+
+        a_cpu = a_tv.cpu().numpy()
+        b_cpu = b_tv.cpu().numpy()
+        
+        print(m, n, k, a.shape, b.shape, c.shape, c_cpu.shape,
+              np.max(np.abs(c_cpu - c)))
+        
 
 
 def cutlass_test_simt():
@@ -289,11 +297,14 @@ def cutlass_test_turing():
     cutlass_test_gemm(main_cu)
 
 def cutlass_test_tf32():
-    params = GemmAlgoParams((128, 128, 16), (64, 64, 16), 2,
-                            "f32,f32,f32,f32,f32", False, True, False,
-                            GemmAlgo.Ampere, TensorOp((16, 8, 8)))
+    params = GemmAlgoParams((128, 128, 16), (64, 64, 16), 2, # thread block tile & warp tile
+                            "f32,f32,f32,f32,f32", False,False,False, # Transpose A,B,C or not
+                            GemmAlgo.Ampere, TensorOp((16, 8, 8))) # TensorOp = MMAOp
     main_cu = CutlassGemm(params, 128, "Sm80")
     cutlass_test_gemm(main_cu)
 
+
 if __name__ == "__main__":
-    cutlass_test_tf32()
+    cutlass_test_simt_dp4a()
+    # cutlass_test_tf32()  # 浮点存在精度问题
+    # cutlass_test_turing()

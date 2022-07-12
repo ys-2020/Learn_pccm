@@ -244,20 +244,12 @@ def _asdv_test_volta_python(coord_input: bool):
                 tensorop=[0, 0, 0])
             duration = time.time() - t
 
-            vis_res = {}
-            for k, v in vis_res_per_thread.items():
-                for k2, v2 in v.items():
-                    if k2 not in vis_res:
-                        vis_res[k2] = {}
-                    vis_res[k2][k] = v2
-
             # print(TestCase().assertAllClose(c_tv, c))
             # print(c_tv.reshape(-1)[:10] -  c.reshape(-1)[:10])
             # print(c_tv.reshape(-1)[-10:] -  c.reshape(-1)[-10:])
 
             print(params.algo, a.mean(), np.linalg.norm(c_tv - c),
                   "Time=", duration)
-            vis_in_relay(list(fig_per_group.values()))
 
 
 def unittest_python():
@@ -323,16 +315,19 @@ def _asdv_test_turing_python(coord_input: bool = False):
     np.random.seed(12315)
     with cudasim.enter_debug_context(True, 3):
         main_cu = GemmMainUnitTest()
-        print(len(main_cu.all_params))
+        print("len(main_cu.all_params)=",len(main_cu.all_params))
 
         for params in main_cu.all_params[:1]:
             print(params.algo)
+
             ker = gen_gemm_kernels(params)
+
             # print("START", params.algo)
             m = 256 + 32
             n = 256 + 40
             k = 32
 
+            
             m = 32
             n = 32
             k = 32
@@ -340,6 +335,7 @@ def _asdv_test_turing_python(coord_input: bool = False):
             n = max(params.ts[1], n)
             k = max(params.ts[2], k)
             print(m, n, k)
+            
             if params.dtype_a == dtypes.int8:
                 a = np.random.randint(-2, 2, size=[m, k]).astype(np.int8)
                 b = np.random.randint(-2, 2, size=[k, n]).astype(np.int8)
@@ -409,12 +405,6 @@ def _asdv_test_turing_python(coord_input: bool = False):
                 tensorop=[0, 0, 0],
                 split_k_slices=1)
             duration = time.time() - t
-            vis_res = {}
-            for k, v in vis_res_per_thread.items():
-                for k2, v2 in v.items():
-                    if k2 not in vis_res:
-                        vis_res[k2] = {}
-                    vis_res[k2][k] = v2
 
 
             # print(TestCase().assertAllClose(c_tv, c))
@@ -424,6 +414,7 @@ def _asdv_test_turing_python(coord_input: bool = False):
             print(params.algo, a.mean(), b.mean(), c.mean(),
                   np.linalg.norm(c_tv - c), "Time=", duration)
 
+            exit()
             # vis_in_relay(list(fig_per_group.values()))
 
 
@@ -435,7 +426,6 @@ if __name__ == "__main__":
     #     layer.add_object(GridPlane([0, 0, 128, 8], [0.5, 0.5], 'green'))
     #     layer.add_object(Coords(coords, [0.5, 0.5], 4, 'red'))
 
-    # vis_in_relay([fig])
     # unittest_python()
     # _asdv_test_simt_python(True)
     _asdv_test_turing_python(True)
