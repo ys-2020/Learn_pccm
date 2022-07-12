@@ -161,7 +161,7 @@ class CutlassGemm(pccm.ParameterizedClass):
         auto timer = tv::CudaContextTimer<>();
 
         status = gemm_op();
-        tv::ssprint(workspace_size, "cut time", timer.report() / 1000.0);
+        tv::ssprint("cutlass time = ", timer.report() / 1000.0);
 
         TV_ASSERT_INVALID_ARG(status == cutlass::Status::kSuccess, "error");
         // checkCudaErrors(cudaDeviceSynchronize());
