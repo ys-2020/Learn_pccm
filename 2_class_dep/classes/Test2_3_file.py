@@ -7,7 +7,7 @@ class Test2(pccm.Class):
         super().__init__()  # init function of pccm.Class do NOT have any arguments 
         self.add_dependency(Test1)
 
-    @pccm.pybind.mark(nogil=True)
+    # @pccm.pybind.mark(nogil=True)
     @pccm.static_function(inline=True)
     def test2_cal(self):    # compute (a+b)*c-d
         code = pccm.FunctionCode("")
@@ -23,6 +23,7 @@ class Test2(pccm.Class):
 class Test3(Test2):     # inherit from class Test2. We can call func in Test2 by Test3.
     def __init__(self):
         super().__init__()
+        self.add_include("iostream")
 
     @pccm.pybind.mark  
     @pccm.static_function   # use static_func for outside calling
@@ -32,3 +33,4 @@ class Test3(Test2):     # inherit from class Test2. We can call func in Test2 by
         return a+b+c+d;
         """).arg("a,b,c,d", "int").ret("int")
         return code
+

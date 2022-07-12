@@ -13,7 +13,7 @@ from cumm.gemm.algospec.core import GemmAlgo, TensorOp
 from cumm.gemm.main import GemmAlgoParams, GemmMainUnitTest
 from cumm import cudasim 
 
-os.environ['CUDA_VISIBLE_DEVICES']='0'
+os.environ['CUDA_VISIBLE_DEVICES']='3'
 CUTLASS_ROOT = Path("/home/yangshang19/nfs/smr/cutlass")
 import numpy as np
 
@@ -209,7 +209,7 @@ def cutlass_profile_win(cu: CutlassGemm):
     return
 
 
-def cutlass_test_gemm(cu: CutlassGemm, spk: int = 1):
+def cutlass_test_gemm(cu: CutlassGemm):
     params = cu.params
     cu.namespace = "CuTlassTest"
     with tv.measure_and_print():
