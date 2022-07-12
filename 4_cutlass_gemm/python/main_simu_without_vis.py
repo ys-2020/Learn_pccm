@@ -137,7 +137,7 @@ def _asdv_test_simt_python(coord_input: bool = False):
             c_tv = np.zeros_like(c)
             # asyncio.run(cudasim.kernel_launch)
             t = time.time()
-            vis_res_per_thread, blocks, threads = main_cu.matmul_python(
+            _, blocks, threads = main_cu.matmul_python(
                 a_tv,
                 b_tv,
                 c_tv,
@@ -153,23 +153,14 @@ def _asdv_test_simt_python(coord_input: bool = False):
                 dcomp=params.dtype_comp,
                 algo=params.algo.value,
                 tensorop=[0, 0, 0])
-            duration = time.time() - t
+            duration = (time.time() - t)/1000
 
-            vis_res = {}
-            for k, v in vis_res_per_thread.items():
-                for k2, v2 in v.items():
-                    if k2 not in vis_res:
-                        vis_res[k2] = {}
-                    vis_res[k2][k] = v2
-
-            vis_in_relay(list(fig_per_group.values()))
-            # print(TestCase().assertAllClose(c_tv, c))
-            print(c_tv.reshape(-1)[:10], c.reshape(-1)[:10])
-            print(c_tv.reshape(-1)[-10:], c.reshape(-1)[-10:])
-
-            print(params.algo, a.mean(), b.mean(),
-                  np.linalg.norm(c_tv - c), "Time=", duration)
-
+            print("Algorithm:",params.algo)
+            print("a.shape = ", a.shape)
+            print("b.shape = ", b.shape)
+            print("c.shape = ", c.shape)
+            print("max_error = ", np.max(np.abs(c_tv - c)))
+            print("Time = ",duration)
 
 def _asdv_test_volta_python(coord_input: bool):
 
@@ -178,11 +169,8 @@ def _asdv_test_volta_python(coord_input: bool):
         main_cu = GemmMainUnitTest()
         for params in main_cu.volta_params[:1]:
             ker = gen_gemm_kernels(params)
-            m = 256 + 32
-            n = 256 + 40
-            k = 32
-            m = 64
-            n = 64
+            m = 128
+            n = 128
             k = 32
             m = max(params.ts[0], m)
             n = max(params.ts[1], n)
@@ -226,7 +214,7 @@ def _asdv_test_volta_python(coord_input: bool):
             c_tv = np.zeros_like(c)
             # asyncio.run(cudasim.kernel_launch)
             t = time.time()
-            vis_res_per_thread, blocks, threads = main_cu.matmul_python(
+            _, blocks, threads = main_cu.matmul_python(
                 a_tv,
                 b_tv,
                 c_tv,
@@ -242,15 +230,14 @@ def _asdv_test_volta_python(coord_input: bool):
                 dcomp=params.dtype_comp,
                 algo=params.algo.value,
                 tensorop=[0, 0, 0])
-            duration = time.time() - t
+            duration = (time.time() - t)/1000
 
-            # print(TestCase().assertAllClose(c_tv, c))
-            # print(c_tv.reshape(-1)[:10] -  c.reshape(-1)[:10])
-            # print(c_tv.reshape(-1)[-10:] -  c.reshape(-1)[-10:])
-
-            print(params.algo, a.mean(), np.linalg.norm(c_tv - c),
-                  "Time=", duration)
-
+            print("Algorithm:",params.algo)
+            print("a.shape = ", a.shape)
+            print("b.shape = ", b.shape)
+            print("c.shape = ", c.shape)
+            print("max_error = ", np.max(np.abs(c_tv - c)))
+            print("Time = ",duration)
 
 def unittest_python():
     np.random.seed(12315)
@@ -290,7 +277,7 @@ def unittest_python():
             c_tv = np.zeros_like(c)
             # asyncio.run(cudasim.kernel_launch)
             t = time.time()
-            vis_res_per_thread, blocks, threads = main_cu.matmul_python(
+            _, blocks, threads = main_cu.matmul_python(
                 a_tv,
                 b_tv,
                 c_tv,
@@ -306,62 +293,73 @@ def unittest_python():
                 dcomp=params.dtype_comp,
                 algo=params.algo.value,
                 tensorop=[0, 0, 0])
-            duration = time.time() - t
-            print(params.algo, a.mean(), np.linalg.norm(c_tv - c),
-                  "Time=", duration)
+            duration = (time.time() - t)/1000
+
+            print("Algorithm:",params.algo)
+            print("a.shape = ", a.shape)
+            print("b.shape = ", b.shape)
+            print("c.shape = ", c.shape)
+            print("max_error = ", np.max(np.abs(c_tv - c)))
+            print("Time = ",duration)
 
 
+# actually Simt: A bug here.
 def _asdv_test_turing_python(coord_input: bool = False):
     np.random.seed(12315)
     with cudasim.enter_debug_context(True, 3):
+    
         main_cu = GemmMainUnitTest()
-        print("len(main_cu.all_params)=",len(main_cu.all_params))
+        # Output:
+        # INPUT TAMP [4, 1] [32, 1] 1
+        # INPUT TAMP [4, 1] [32, 1] 1
+        # OUT TMAP [8, 2, 1] 8 [1, 2, 1, 1, 1] [1, 4, 4, 1, 128] [1, 2, 1] [1, 1, 2, 1, 4] [1, 4] [1, 32]
+        # OUT TMAP [8, 2, 1] 8 [1, 2, 1, 1, 1] [1, 4, 4, 1, 128] [1, 2, 1] [1, 1, 2, 1, 4] [1, 4] [1, 32]
+        # 9280 16896
+
+
+        # print("len(main_cu.all_params)=",len(main_cu.all_params))
 
         for params in main_cu.all_params[:1]:
-            print(params.algo)
+            
+            # params is generated by : (in cumm/gemm/main.py)
+            # gen_gemm_params((128, 128, 8),
+            #                 (32, 64, 8), 2, "f32,f32,f32,f32,f32",
+            #                 kernel.GemmAlgo.Simt, None),
 
             ker = gen_gemm_kernels(params)
 
-            # print("START", params.algo)
-            m = 256 + 32
-            n = 256 + 40
-            k = 32
-
-            
-            m = 32
-            n = 32
-            k = 32
+            m = 128
+            n = 128
+            k = 16
             m = max(params.ts[0], m)
             n = max(params.ts[1], n)
             k = max(params.ts[2], k)
-            print(m, n, k)
+            print("(m,n,k) = ",m, n, k)
             
+            # random filling
             if params.dtype_a == dtypes.int8:
                 a = np.random.randint(-2, 2, size=[m, k]).astype(np.int8)
                 b = np.random.randint(-2, 2, size=[k, n]).astype(np.int8)
                 dtype_c = params.dtype_c.npdtype()
                 c = (a.astype(np.float32) @ b.astype(np.float32)).astype(
                     dtypes.get_npdtype(params.dtype_c))
-
             else:
                 a = np.random.uniform(-1, 1, size=[m, k]).astype(
                     dtypes.get_npdtype(params.dtype_a))
                 b = np.random.uniform(-1, 1, size=[k, n]).astype(
                     dtypes.get_npdtype(params.dtype_b))
-                # a[:, 32:] = 0
-                # b[32:] = 0
-
                 c = (a @ b).astype(dtypes.get_npdtype(params.dtype_c))
+            
             if params.trans_a:
                 a = np.ascontiguousarray(a.transpose(1, 0))
             if params.trans_b:
                 b = np.ascontiguousarray(b.transpose(1, 0))
             if params.trans_c:
                 c = np.ascontiguousarray(c.transpose(1, 0))
-            # print("WTF PREPARED")
+
+            # mapping the index
             a_meta = np.zeros_like(a, dtype=np.int64)
             b_meta = np.zeros_like(b, dtype=np.int64)
-
             if coord_input:
                 if params.trans_a:
                     for i in range(k):
@@ -371,6 +369,7 @@ def _asdv_test_turing_python(coord_input: bool = False):
                     for i in range(m):
                         for j in range(k):
                             a_meta[i, j] = (i * k + j)
+        
                 if params.trans_b:
                     for i in range(n):
                         for j in range(k):
@@ -382,12 +381,12 @@ def _asdv_test_turing_python(coord_input: bool = False):
 
             a_tv = a.copy()
             b_tv = b.copy()
-            cc_tv = np.zeros_like(c)
-
             c_tv = np.zeros_like(c)
-            # asyncio.run(cudasim.kernel_launch)
+
             t = time.time()
-            vis_res_per_thread, blocks, threads = main_cu.matmul_python(
+            
+            # Output other info:
+            _, blocks, threads = main_cu.matmul_python(
                 a_tv,
                 b_tv,
                 c_tv,
@@ -404,18 +403,17 @@ def _asdv_test_turing_python(coord_input: bool = False):
                 algo=params.algo.value,
                 tensorop=[0, 0, 0],
                 split_k_slices=1)
-            duration = time.time() - t
+            duration = (time.time() - t)/1000
 
-
-            # print(TestCase().assertAllClose(c_tv, c))
-            # print(c_tv.reshape(-1)[:10], c.reshape(-1)[:10])
-            # print(c_tv.reshape(-1)[-10:] -  c.reshape(-1)[-10:])
-
-            print(params.algo, a.mean(), b.mean(), c.mean(),
-                  np.linalg.norm(c_tv - c), "Time=", duration)
-
-            exit()
-            # vis_in_relay(list(fig_per_group.values()))
+            print()
+            print("Blocks:",blocks)
+            print("Threads:",threads)
+            print("Algorithm:",params.algo)
+            print("a.shape = ", a.shape)
+            print("b.shape = ", b.shape)
+            print("c.shape = ", c.shape)
+            print("max_error = ", np.max(np.abs(c_tv - c)))
+            print("Time = ",duration)
 
 
 if __name__ == "__main__":
