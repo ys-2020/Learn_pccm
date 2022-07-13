@@ -113,12 +113,6 @@ def _asdv_test_regular_gemm():
         print("RTC COMPILE TIME", time.time() - t)
         # print(mod.kernels)
         # breakpoint()
-        m = 256 + 32
-        n = 256 + 40
-        k = 136
-        m *= 2
-        n *= 2
-        k *= 2
         m = 64
         n = 64
         k = 64
