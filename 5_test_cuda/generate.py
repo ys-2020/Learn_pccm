@@ -20,7 +20,7 @@ class cuda_add_wrapper(pccm.Class):
     def cuda_add_run(self):
         code = pccm.FunctionCode("")
         code.raw("""
-         auto CUDA_ADD = cuda_add_class();
+         //auto CUDA_ADD = cuda_add_class();
 
          int c;
          int *dev_c;
@@ -43,7 +43,10 @@ if __name__ == "__main__":
     test.namespace = "test"
     lib = builder.build_pybind(
         [test],
-        Path(__file__).parent / "mylib")
+        Path(__file__).parent / "mylib",
+        pybind_file_suffix=".cu")
+    
+    # compiler is defined by suffix !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     
     # lib.classes.cuda_add_wrapper.cuda_add_run()
 

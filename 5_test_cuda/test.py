@@ -8,7 +8,7 @@ import importlib
 
 module_spec = importlib.util.find_spec('mylib')
 lib = importlib.util.module_from_spec(module_spec)
-print(dir(lib))
+lib.test.cuda_add_wrapper.cuda_add_run()
 
 
 
