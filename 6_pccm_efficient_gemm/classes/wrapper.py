@@ -19,7 +19,7 @@ class EfficientGemm_Wrapper(pccm.Class):
         self.add_dependency(EfficientGemm)
 
     
-    # @pccm.pybind.mark()
+    @pccm.pybind.mark
     @pccm.cuda.static_function
     def run_efficientgemm(self):
         code = pccm.FunctionCode("")
@@ -28,7 +28,7 @@ class EfficientGemm_Wrapper(pccm.Class):
         code.raw(f"""
         auto Random_Init = random_init_class();
         auto Check_Result = check_class();
-        auto Efficient_Gemm = EfficientGemm();
+        // auto Efficient_Gemm = EfficientGemm();
 
         int m = 5120;
         int n = 4096;
