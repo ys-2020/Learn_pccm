@@ -12,7 +12,7 @@ import pickle
 
 from cumm.common import CUDALibs, GemmBasic, TensorView
 
-REPO_ROOT = Path("/home/yangshang19/nfs/smr/pccm_efficient_gemm")
+REPO_ROOT = Path("/home/yangshang19/nfs/smr/Learn_pccm")
 
 class GemmDependency(pccm.Class):
     def __init__(self):
@@ -20,7 +20,7 @@ class GemmDependency(pccm.Class):
         self.add_dependency(CUDALibs)
 
         self.add_include("mem.cuh")
-        self.build_meta.includes.append(REPO_ROOT/"include")
+        self.build_meta.includes.append(REPO_ROOT/"6_pccm_efficient_gemm"/"include")
 
 class EfficientGemm(pccm.Class):
     def __init__(self):
