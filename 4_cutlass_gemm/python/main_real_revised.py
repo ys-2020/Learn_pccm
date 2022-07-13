@@ -64,7 +64,6 @@ def build_gemm_lib(cus: List[pccm.Class]):
                                     pybind_file_suffix=".cc",
                                     verbose=False,
                                     disable_anno=True,
-                                    global_header_only=False,
                                     std="c++17")
 
     return lib
@@ -79,9 +78,9 @@ from cumm.nvrtc import CummNVRTCModule
 def _asdv_test_regular_gemm():
     np.random.seed(12315)
     lib_object = None 
-    use_nvrtc = True 
+    use_nvrtc = False 
     with cudasim.enter_debug_context(True, 3):
-        main_cu = GemmMainUnitTest()
+        main_cu = GemmMainUnitTest() # Some outputs here
         main_cu.namespace = "cumm.gemm.main"
 
     if not use_nvrtc:
