@@ -78,7 +78,7 @@ from cumm.nvrtc import CummNVRTCModule
 def _asdv_test_regular_gemm():
     np.random.seed(12315)
     lib_object = None 
-    use_nvrtc = False 
+    use_nvrtc = False
     with cudasim.enter_debug_context(True, 3):
         main_cu = GemmMainUnitTest() # Some outputs here
         main_cu.namespace = "cumm.gemm.main"

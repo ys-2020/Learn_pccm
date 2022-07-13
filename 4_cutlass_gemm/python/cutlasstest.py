@@ -308,6 +308,9 @@ def cutlass_test_tf32():
 
 
 if __name__ == "__main__":
-    # cutlass_test_simt_dp4a()
-    cutlass_test_tf32()  
+    print("int8")
+    cutlass_test_simt_dp4a()
+
+    # print("float32")
+    # cutlass_test_tf32()  
     # cutlass_test_turing()

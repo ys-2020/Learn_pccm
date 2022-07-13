@@ -7,7 +7,7 @@ class cuda_add_class(pccm.Class):
         self.add_include("iostream","cmath")
 
     # @pccm.pybind.mark
-    @pccm.cuda.cuda_global_function()  
+    @pccm.cuda.cuda_global_function 
     def cuda_add(self):
         code = pccm.FunctionCode("")
         code.raw("""

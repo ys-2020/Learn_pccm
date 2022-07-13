@@ -20,7 +20,7 @@ class cuda_add_wrapper(pccm.Class):
     def cuda_add_run(self):
         code = pccm.FunctionCode("")
         code.raw("""
-         //auto CUDA_ADD = cuda_add_class();
+         auto CUDA_ADD = cuda_add_class();
 
          int c;
          int *dev_c;
@@ -40,7 +40,7 @@ class cuda_add_wrapper(pccm.Class):
 if __name__ == "__main__":
     
     test = cuda_add_wrapper()
-
+    test.namespace = "test"
     lib = builder.build_pybind(
         [test],
         Path(__file__).parent / "mylib")
