@@ -1,3 +1,5 @@
+# This file is of no use.
+
 import pccm
 
 class mem_class(pccm.Class):
@@ -6,7 +8,7 @@ class mem_class(pccm.Class):
         self.add_include("cstdint")
         self.add_include("cstdlib")
 
-    # @pccm.pybind.mark
+    @pccm.pybind.mark
     @pccm.cuda.member_function(device=True,forceinline=True)
     def smem_u32addr(self):
         code = pccm.FunctionCode()

@@ -6,7 +6,7 @@ class check_class(pccm.Class):
         self.add_include("cmath")
         self.add_include("iostream")
 
-    @pccm.pybind.mark
+    # @pccm.pybind.mark
     @pccm.member_function()
     def check(self):
         code = pccm.FunctionCode("")

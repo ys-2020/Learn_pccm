@@ -107,7 +107,6 @@ class EfficientGemm(pccm.Class):
             
             // ys: 32 threads get 128 Bytes, each thread get 4 Byte for B
             // ys: But why each thread's addr only +1?
-            // ys: what is strided and contig?
             
             // haotian: warp_id is 4x2. per warp 32x1 or 1x64
             uint32_t A_lds_addr = smem_u32addr(

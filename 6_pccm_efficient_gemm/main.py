@@ -1,4 +1,4 @@
-from classes.wrapper import *
+from classes.wrapper import * 
     
 
 def test_efficient_gemm():
@@ -16,8 +16,8 @@ def test_efficient_gemm():
 
 if __name__ == "__main__":
     lib = test_efficient_gemm()
-    print(lib.EfficientGemmTest.EfficientGemm_Wrapper.run_efficientgemm())
-    print("Check Pass!")
+    if (lib.EfficientGemmTest.EfficientGemm_Wrapper.run_efficientgemm() == True):
+        print("The result is right! Check Pass!")
 
 
 
