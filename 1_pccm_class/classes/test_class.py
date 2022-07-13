@@ -10,7 +10,7 @@ class Test1(pccm.Class):
         self.add_include("iostream","cmath")
         # self.add_member("add_func","std::function<std::int,")
         # self.add_typedef("value_type","char")
-        # self.add_static_const("kConstVal","int","5")
+        self.add_static_const("kConstVal","int","5")
         # self.add_enum_class("Mode",[("kConvolution",0),
         #                             ("kCrossCorrelation",1)])
     
@@ -21,6 +21,6 @@ class Test1(pccm.Class):
     def add(self):
         code = pccm.FunctionCode("")
         code.raw("""
-        return a + b;
+        return a + b + kConstVal;
         """).arg("a", "int").arg("b","double").ret("int")   # multiple types of variables.  
         return code
