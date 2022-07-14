@@ -3,22 +3,24 @@ from typing import List
 
 import pccm
 from pccm.core import FunctionCode
-
 from cumm.common import TensorView as tv
+
+import classes.gemm
 from classes.gemm import *
 from classes.init import random_init_class
 from classes.check import check_class
-import classes.gemm
+from classes.gemm_param import GemmParam
+from classes.gemm_param import GLOBAL_GEMM_PARAM
 
 
-class EfficientGemm_Wrapper(pccm.Class):
-    def __init__(self):
+class EfficientGemm_Wrapper(pccm.ParameterizedClass):
+    def __init__(self,params:GemmParam):
         super().__init__()
         self.add_dependency(random_init_class)
         self.add_dependency(check_class)
         self.add_dependency(EfficientGemm)
+        self.params = params
 
-    
     @pccm.pybind.mark
     @pccm.cuda.static_function
     def run_efficientgemm(self):
@@ -28,11 +30,24 @@ class EfficientGemm_Wrapper(pccm.Class):
         code.raw(f"""
         auto Random_Init = random_init_class();
         auto Check_Result = check_class();
-        // auto Efficient_Gemm = EfficientGemm();
+        //auto Efficient_Gemm = EfficientGemm();
 
-        int m = 5120;
-        int n = 4096;
-        int k = 4096;
+        // param passing
+        int m = {self.params.M};
+        int n = {self.params.N};
+        int k = {self.params.K};
+
+        auto warp_size     = {self.params.warp_size};
+        auto tblock_tile_m = {self.params.tblock_tile[0]};
+        auto tblock_tile_n = {self.params.tblock_tile[1]};
+        auto tblock_tile_k = {self.params.tblock_tile[2]};
+        auto thread_ldg_a  = {self.params.thread_ldg_a};
+        auto thread_ldg_b  = {self.params.thread_ldg_b};
+        auto warp_size_m   = {self.params.warp_size_m};
+        auto warp_size_n   = {self.params.warp_size_n};
+        auto tblock_size_m = {self.params.tblock_size_m};
+        auto tblock_size_n = {self.params.tblock_size_n};
+
 
         int n_iter = 10;
         // 1 warp = 32 threads constraint
